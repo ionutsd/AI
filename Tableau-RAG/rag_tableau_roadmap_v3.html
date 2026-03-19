@@ -1,0 +1,1288 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RAG × Tableau — Learning Roadmap v3</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,300&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --ink: #0d0d0d;
+    --paper: #f5f0e8;
+    --accent: #e8410a;
+    --accent2: #2b6cb0;
+    --muted: #7a7066;
+    --line: #d4cdc0;
+    --phase1: #e8410a;
+    --phase2: #d4870a;
+    --phase3: #2b6cb0;
+    --phase4: #1a7a4a;
+    --phase5: #7b3fa0;
+    --phase6: #b5460f;
+    --google: #1a73e8;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--paper);
+    color: var(--ink);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    line-height: 1.6;
+    min-height: 100vh;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1000;
+    opacity: 0.6;
+  }
+
+  .hero {
+    padding: 80px 60px 60px;
+    border-bottom: 2px solid var(--ink);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .hero::after {
+    content: 'RAG';
+    position: absolute;
+    right: -20px;
+    top: -30px;
+    font-family: 'Syne', sans-serif;
+    font-size: 260px;
+    font-weight: 800;
+    color: var(--ink);
+    opacity: 0.04;
+    letter-spacing: -10px;
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .hero-tag {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .hero-tag::before { content: ''; width: 32px; height: 2px; background: var(--accent); }
+
+  .hero h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(38px, 6vw, 72px);
+    font-weight: 800;
+    line-height: 1.0;
+    letter-spacing: -2px;
+    max-width: 700px;
+    margin-bottom: 28px;
+  }
+  .hero h1 span { color: var(--accent); }
+
+  .hero-desc {
+    font-size: 16px;
+    font-weight: 400;
+    color: var(--muted);
+    max-width: 580px;
+    line-height: 1.7;
+    margin-bottom: 32px;
+  }
+
+  .spec-bar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 36px;
+  }
+  .spec-pill {
+    font-family: 'DM Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    padding: 5px 12px;
+    border: 1.5px solid var(--ink);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .spec-pill .label { color: var(--muted); margin-right: 2px; }
+  .spec-pill.changed { border-color: var(--google); color: var(--google); }
+  .spec-pill.changed .label { color: var(--google); opacity: 0.7; }
+
+  .hero-stats { display: flex; gap: 40px; flex-wrap: wrap; }
+  .stat { display: flex; flex-direction: column; gap: 4px; }
+  .stat-num { font-family: 'Syne', sans-serif; font-size: 32px; font-weight: 800; line-height: 1; }
+  .stat-label { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); }
+
+  .section { padding: 60px 60px; border-bottom: 1px solid var(--line); }
+
+  .section-label {
+    font-family: 'DM Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-label::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
+  .section-title { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 700; margin-bottom: 32px; letter-spacing: -0.5px; }
+
+  .arch {
+    display: flex;
+    align-items: stretch;
+    margin: 32px 0;
+    overflow-x: auto;
+    padding-bottom: 8px;
+  }
+  .arch-block {
+    flex: 1;
+    min-width: 130px;
+    border: 1.5px solid var(--ink);
+    padding: 18px 14px;
+    background: white;
+  }
+  .arch-block + .arch-block { margin-left: -1.5px; }
+  .arch-block.highlight { background: var(--ink); color: var(--paper); }
+  .arch-block.google-block { background: #e8f4ff; border-color: var(--google); }
+  .arch-arrow { display: flex; align-items: center; padding: 0 8px; font-size: 20px; color: var(--accent); font-weight: bold; flex-shrink: 0; }
+  .arch-icon { font-size: 22px; margin-bottom: 8px; }
+  .arch-name { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 700; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 0.05em; }
+  .arch-desc { font-size: 11px; line-height: 1.5; color: var(--muted); }
+  .arch-block.highlight .arch-desc { color: #bbb; }
+  .arch-block.google-block .arch-desc { color: #444; }
+  .arch-tech { font-family: 'DM Mono', monospace; font-size: 10px; margin-top: 10px; padding: 3px 7px; background: rgba(0,0,0,0.06); display: inline-block; }
+  .arch-block.highlight .arch-tech { background: rgba(255,255,255,0.15); }
+  .arch-block.google-block .arch-tech { background: rgba(26,115,232,0.12); color: var(--google); }
+
+  .tools-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; margin-top: 24px; }
+  .tool-card { border: 1.5px solid var(--line); padding: 20px; transition: border-color 0.2s, transform 0.2s; }
+  .tool-card:hover { border-color: var(--ink); transform: translateY(-2px); }
+  .tool-card.featured { border-color: var(--google); background: #f0f7ff; }
+  .tool-card-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
+  .tool-name { font-family: 'Syne', sans-serif; font-size: 16px; font-weight: 700; }
+  .tool-badge { font-family: 'DM Mono', monospace; font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; padding: 3px 8px; border: 1px solid currentColor; }
+  .badge-free { color: var(--phase4); }
+  .badge-key  { color: var(--phase2); }
+  .badge-rec  { color: var(--google); }
+  .tool-role { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--muted); letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 8px; }
+  .tool-desc { font-size: 13px; line-height: 1.55; color: #444; }
+
+  .phases { margin-top: 16px; }
+  .phase { border: 1.5px solid var(--ink); margin-bottom: 24px; overflow: hidden; }
+  .phase-header { display: flex; align-items: stretch; border-bottom: 1.5px solid var(--ink); cursor: pointer; user-select: none; }
+  .phase-header:hover { background: rgba(0,0,0,0.02); }
+  .phase-num {
+    font-family: 'Syne', sans-serif; font-size: 42px; font-weight: 800; line-height: 1;
+    padding: 20px 24px; border-right: 1.5px solid var(--ink);
+    display: flex; align-items: center; min-width: 90px; justify-content: center; color: white;
+  }
+  .phase-meta { padding: 20px 24px; flex: 1; }
+  .phase-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; margin-bottom: 4px; }
+  .phase-subtitle { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.08em; }
+  .phase-toggle { padding: 20px 24px; display: flex; align-items: center; font-size: 20px; color: var(--muted); transition: transform 0.3s; }
+  .phase-body { padding: 32px; display: none; }
+  .phase.open .phase-body { display: block; }
+  .phase.open .phase-toggle { transform: rotate(180deg); }
+
+  .steps { display: flex; flex-direction: column; gap: 24px; }
+  .step { display: grid; grid-template-columns: 32px 1fr; gap: 16px; align-items: start; }
+  .step-dot {
+    width: 32px; height: 32px; border: 2px solid var(--ink); border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500;
+    flex-shrink: 0; margin-top: 2px;
+  }
+  .step-content h4 { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; margin-bottom: 6px; }
+  .step-content p { font-size: 13.5px; line-height: 1.65; color: #444; margin-bottom: 10px; }
+
+  .code-block {
+    background: var(--ink); color: #a8d8a0;
+    font-family: 'DM Mono', monospace; font-size: 12px;
+    padding: 14px 16px; line-height: 1.7; overflow-x: auto; white-space: pre; margin: 10px 0;
+  }
+  .code-block .comment { color: #6a8f60; font-style: italic; }
+  .code-block .cmd { color: #f0c070; }
+  .code-block .str { color: #e08080; }
+  .code-block .hi { color: #ffffff; font-weight: 500; }
+  .code-block .google { color: #7eb8f7; }
+
+  .callout { border-left: 3px solid var(--accent2); padding: 12px 16px; background: rgba(43,108,176,0.06); font-size: 13px; line-height: 1.6; margin: 12px 0; }
+  .callout strong { color: var(--accent2); }
+  .callout.warn { border-color: var(--accent); background: rgba(232,65,10,0.06); }
+  .callout.warn strong { color: var(--accent); }
+  .callout.success { border-color: var(--phase4); background: rgba(26,122,74,0.06); }
+  .callout.success strong { color: var(--phase4); }
+  .callout.google { border-color: var(--google); background: rgba(26,115,232,0.06); }
+  .callout.google strong { color: var(--google); }
+
+  .concept { background: var(--ink); color: var(--paper); padding: 28px 32px; margin: 20px 0; }
+  .concept-title { font-family: 'DM Mono', monospace; font-size: 10px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); margin-bottom: 10px; }
+  .concept p { font-size: 14px; line-height: 1.7; color: #ccc; }
+  .concept strong { color: white; }
+
+  .checklist { list-style: none; margin: 12px 0; }
+  .checklist li { font-size: 13.5px; padding: 6px 0; display: flex; align-items: flex-start; gap: 10px; border-bottom: 1px solid var(--line); line-height: 1.5; }
+  .checklist li::before { content: '□'; font-size: 16px; flex-shrink: 0; margin-top: -1px; color: var(--muted); }
+
+  .p1 .phase-num { background: var(--phase1); }
+  .p2 .phase-num { background: var(--phase2); }
+  .p3 .phase-num { background: var(--phase3); }
+  .p4 .phase-num { background: var(--phase4); }
+  .p5 .phase-num { background: var(--phase5); }
+  .p6 .phase-num { background: var(--phase6); }
+
+  .p1 .step-dot { border-color: var(--phase1); color: var(--phase1); }
+  .p2 .step-dot { border-color: var(--phase2); color: var(--phase2); }
+  .p3 .step-dot { border-color: var(--phase3); color: var(--phase3); }
+  .p4 .step-dot { border-color: var(--phase4); color: var(--phase4); }
+  .p5 .step-dot { border-color: var(--phase5); color: var(--phase5); }
+  .p6 .step-dot { border-color: var(--phase6); color: var(--phase6); }
+
+  footer { padding: 40px 60px; display: flex; justify-content: space-between; align-items: center; border-top: 2px solid var(--ink); flex-wrap: wrap; gap: 16px; }
+  footer p { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); letter-spacing: 0.05em; }
+  .footer-logo { font-family: 'Syne', sans-serif; font-size: 18px; font-weight: 800; letter-spacing: -1px; }
+
+  @media (max-width: 700px) {
+    .hero, .section, footer { padding: 40px 24px; }
+    .arch { flex-direction: column; }
+    .arch-arrow { display: none; }
+    .arch-block + .arch-block { margin-left: 0; margin-top: -1.5px; }
+    .phase-body { padding: 20px; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-tag">Learning Roadmap v3 · Personalised · Gemini Free Tier</div>
+  <h1>Build a <span>RAG</span> inside Tableau Desktop</h1>
+  <p class="hero-desc">
+    A fully personalised, step-by-step guide to wiring up Retrieval-Augmented Generation
+    with the Superstore dataset — ask questions in plain English and get AI-powered answers
+    right inside your dashboard. 100% free, powered by Google Gemini API.
+  </p>
+
+  <div class="spec-bar">
+    <div class="spec-pill"><span class="label">OS</span> Windows</div>
+    <div class="spec-pill"><span class="label">CPU</span> i5-6300HQ</div>
+    <div class="spec-pill"><span class="label">RAM</span> 8GB</div>
+    <div class="spec-pill"><span class="label">GPU</span> GTX 950M 2GB</div>
+    <div class="spec-pill"><span class="label">Terminal</span> Windows Terminal → CMD</div>
+    <div class="spec-pill changed"><span class="label">LLM</span> Gemini 1.5 Flash (free API) ✦ Updated</div>
+    <div class="spec-pill changed"><span class="label">Ollama</span> Removed — not needed ✦ Updated</div>
+    <div class="spec-pill"><span class="label">Data</span> Superstore CSV</div>
+  </div>
+
+  <div class="hero-stats">
+    <div class="stat"><span class="stat-num" style="color:var(--phase1)">6</span><span class="stat-label">Phases</span></div>
+    <div class="stat"><span class="stat-num" style="color:var(--google)">Free</span><span class="stat-label">Gemini API</span></div>
+    <div class="stat"><span class="stat-num" style="color:var(--phase3)">~4</span><span class="stat-label">Hours to build</span></div>
+    <div class="stat"><span class="stat-num" style="color:var(--phase4)">2-3s</span><span class="stat-label">Answer speed</span></div>
+  </div>
+</header>
+
+<!-- WHY GEMINI -->
+<section class="section" style="padding-top:40px; padding-bottom:40px;">
+  <div class="section-label">Why we switched from Ollama to Gemini</div>
+  <div class="callout google">
+    <strong>✦ Updated in v3:</strong> Ollama was crashing on your machine because your 8GB RAM wasn't enough to run a local LLM alongside Windows, ChromaDB, and FastAPI simultaneously. Gemini Flash free tier solves every single issue: <strong>zero RAM usage for the model</strong> (it runs on Google's servers), <strong>2–3 second answers</strong> instead of 25 seconds, <strong>completely free</strong> up to 1,500 requests/day, and your data stays safe. Nothing else in the plan changes — same Python code, same ChromaDB, same Tableau extension, same 6 phases.
+  </div>
+</section>
+
+<!-- WHAT IS RAG -->
+<section class="section">
+  <div class="section-label">Before we start</div>
+  <div class="section-title">What exactly IS a RAG? 🤔</div>
+
+  <div class="concept">
+    <div class="concept-title">The Plain-English Explanation</div>
+    <p>
+      Imagine you have a <strong>very smart friend (an AI)</strong> who knows everything — but hasn't seen your Superstore data.
+      A RAG is how you <strong>hand that friend your data first</strong>, so when you ask "Which region had the worst profit in Q3?",
+      they answer based on <em>your actual numbers</em> — not just general knowledge.<br><br>
+      RAG stands for <strong>Retrieval-Augmented Generation</strong>: you <strong>retrieve</strong> relevant chunks of your data,
+      then <strong>augment</strong> (add) them to the AI's prompt, so it <strong>generates</strong> a grounded, accurate answer.
+    </p>
+  </div>
+
+  <div class="arch">
+    <div class="arch-block">
+      <div class="arch-icon">📊</div>
+      <div class="arch-name">Your Data</div>
+      <div class="arch-desc">Superstore CSV — orders, customers, products, profits (~10k rows)</div>
+      <div class="arch-tech">superstore.csv</div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-block">
+      <div class="arch-icon">🔢</div>
+      <div class="arch-name">Embeddings</div>
+      <div class="arch-desc">Convert rows into numbers for fast similarity search</div>
+      <div class="arch-tech">sentence-transformers</div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-block">
+      <div class="arch-icon">📦</div>
+      <div class="arch-name">Vector Store</div>
+      <div class="arch-desc">Local database on your SSD — fast, tiny, no RAM issues</div>
+      <div class="arch-tech">ChromaDB</div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-block highlight">
+      <div class="arch-icon">🧠</div>
+      <div class="arch-name">RAG Engine</div>
+      <div class="arch-desc">Question → fetch rows → send to Gemini → answer</div>
+      <div class="arch-tech">LangChain</div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-block google-block">
+      <div class="arch-icon">✦</div>
+      <div class="arch-name">Gemini API</div>
+      <div class="arch-desc">Free tier · runs on Google's servers · zero RAM on your PC</div>
+      <div class="arch-tech">gemini-1.5-flash</div>
+    </div>
+    <div class="arch-arrow">→</div>
+    <div class="arch-block">
+      <div class="arch-icon">🖥️</div>
+      <div class="arch-name">Tableau</div>
+      <div class="arch-desc">AI chat panel lives inside your dashboard</div>
+      <div class="arch-tech">Dashboard Extension</div>
+    </div>
+  </div>
+</section>
+
+<!-- TOOLS -->
+<section class="section">
+  <div class="section-label">Toolbox — all free</div>
+  <div class="section-title">Everything you need ✅</div>
+
+  <div class="tools-grid">
+
+    <div class="tool-card">
+      <div class="tool-card-top">
+        <div class="tool-name">Python 3.11+</div>
+        <span class="tool-badge badge-free">Free</span>
+      </div>
+      <div class="tool-role">Core Language</div>
+      <div class="tool-desc">You already know the basics! All backend code is Python. Always activate your venv with <code>cd /d C:\Projects\tableau-rag</code> then <code>venv\Scripts\activate</code>.</div>
+    </div>
+
+    <div class="tool-card featured">
+      <div class="tool-card-top">
+        <div class="tool-name">Gemini 1.5 Flash</div>
+        <span class="tool-badge badge-rec">Free · Recommended</span>
+      </div>
+      <div class="tool-role">AI Model · Google Cloud</div>
+      <div class="tool-desc">Replaces Ollama entirely. Runs on Google's servers — zero RAM on your machine. Free tier gives you 1,500 requests/day and 1 million tokens/minute. Way more than enough for learning. Get your key at <strong>aistudio.google.com</strong>.</div>
+    </div>
+
+    <div class="tool-card">
+      <div class="tool-card-top">
+        <div class="tool-name">LangChain</div>
+        <span class="tool-badge badge-free">Free</span>
+      </div>
+      <div class="tool-role">RAG Orchestration</div>
+      <div class="tool-desc">Wires everything together — finds relevant Superstore rows in ChromaDB, sends them with your question to Gemini, returns the answer. Works identically whether you use Gemini, Ollama, or any other model.</div>
+    </div>
+
+    <div class="tool-card">
+      <div class="tool-card-top">
+        <div class="tool-name">ChromaDB</div>
+        <span class="tool-badge badge-free">Free · Local</span>
+      </div>
+      <div class="tool-role">Vector Database</div>
+      <div class="tool-desc">Stores your Superstore embeddings on your SSD. Tiny footprint — uses almost no RAM. You build it once and it persists. Since Superstore is ~10k rows, the whole database is only a few MB.</div>
+    </div>
+
+    <div class="tool-card">
+      <div class="tool-card-top">
+        <div class="tool-name">FastAPI</div>
+        <span class="tool-badge badge-free">Free</span>
+      </div>
+      <div class="tool-role">Backend API Server</div>
+      <div class="tool-desc">Creates a lightweight web server on localhost:8000. Tableau's Extension sends questions to it and gets back AI answers. Very low RAM footprint — no issues on your machine.</div>
+    </div>
+
+    <div class="tool-card">
+      <div class="tool-card-top">
+        <div class="tool-name">Tableau Desktop</div>
+        <span class="tool-badge badge-free">Free version ✅</span>
+      </div>
+      <div class="tool-role">Dashboard + Extension Host</div>
+      <div class="tool-desc">Free Tableau Desktop fully supports Dashboard Extensions. You'll drag a panel onto your dashboard that hosts the AI chat. One permission popup on first load — just click Allow.</div>
+    </div>
+
+    <div class="tool-card">
+      <div class="tool-card-top">
+        <div class="tool-name">VS Code</div>
+        <span class="tool-badge badge-free">Free</span>
+      </div>
+      <div class="tool-role">Code Editor</div>
+      <div class="tool-desc">Best free editor for Python on Windows. Install the Python extension inside VS Code for syntax highlighting. Use Windows Terminal (CMD, not PowerShell) for all commands.</div>
+    </div>
+
+    <div class="tool-card">
+      <div class="tool-card-top">
+        <div class="tool-name">pandas</div>
+        <span class="tool-badge badge-free">Free</span>
+      </div>
+      <div class="tool-role">Data Processing</div>
+      <div class="tool-desc">Reads and processes the Superstore CSV. You may already know this from your Python classes. Used only during the ingestion step — minimal RAM impact.</div>
+    </div>
+
+  </div>
+</section>
+
+<!-- PHASES -->
+<section class="section">
+  <div class="section-label">The Plan</div>
+  <div class="section-title">6 Phases — click each to expand 👇</div>
+
+  <div class="phases">
+
+    <!-- PHASE 1 -->
+    <div class="phase p1 open" id="phase1">
+      <div class="phase-header" onclick="togglePhase('phase1')">
+        <div class="phase-num">1</div>
+        <div class="phase-meta">
+          <div class="phase-title">Set Up Your Environment</div>
+          <div class="phase-subtitle">~30 min · Python, packages, Gemini API key</div>
+        </div>
+        <div class="phase-toggle">▼</div>
+      </div>
+      <div class="phase-body">
+        <div class="concept">
+          <div class="concept-title">What you'll learn</div>
+          <p>How to set up a clean Python project on Windows, install all necessary packages, and get your free Gemini API key. No local AI model to download — much simpler than before!</p>
+        </div>
+        <div class="steps">
+
+          <div class="step">
+            <div class="step-dot">1</div>
+            <div class="step-content">
+              <h4>Always open terminal correctly — CMD not PowerShell</h4>
+              <p>Every time you open Windows Terminal for this project, click the <strong>dropdown arrow ˅</strong> next to the + button and select <strong>Command Prompt</strong>. Then navigate to your project:</p>
+              <div class="code-block"><span class="comment"># These two lines start EVERY session — memorise them!</span>
+<span class="cmd">cd /d</span> C:\Projects\tableau-rag
+venv\Scripts\activate
+<span class="comment"># You should see (venv) at the start of your prompt ✅</span></div>
+              <div class="callout warn"><strong>⚠️ Always use cd /d not just cd.</strong> The /d flag is required on Windows when changing drives. Without it, cd silently does nothing — which caused confusion earlier!</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-dot">2</div>
+            <div class="step-content">
+              <h4>Create your project folder &amp; virtual environment</h4>
+              <p>If you haven't already created the project folder from earlier attempts, run this. If the folder exists, skip to step 3.</p>
+              <div class="code-block"><span class="comment"># Create project folder (skip if already exists)</span>
+<span class="cmd">mkdir</span> C:\Projects\tableau-rag
+<span class="cmd">cd /d</span> C:\Projects\tableau-rag
+
+<span class="comment"># Create virtual environment</span>
+<span class="cmd">python -m venv</span> venv
+
+<span class="comment"># Activate it</span>
+venv\Scripts\activate
+<span class="comment"># Prompt should now show: (venv) C:\Projects\tableau-rag></span></div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-dot">3</div>
+            <div class="step-content">
+              <h4>Install all Python packages</h4>
+              <p>With venv active, install everything in one go. No Ollama packages needed anymore!</p>
+              <div class="code-block"><span class="comment"># Core RAG packages</span>
+<span class="cmd">pip install</span> langchain langchain-community
+<span class="cmd">pip install</span> langchain-google-genai
+<span class="cmd">pip install</span> chromadb sentence-transformers
+<span class="cmd">pip install</span> pandas fastapi uvicorn</div>
+              <div class="callout"><strong>Takes 3–5 minutes</strong> — lots of text scrolling is normal. Wait until you get the prompt back before typing anything else. If a specific package fails, install it individually with <code>pip install [name]</code>.</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-dot">4</div>
+            <div class="step-content">
+              <h4>Get your free Gemini API key</h4>
+              <p>This replaces Ollama entirely — no model download, no RAM issues:</p>
+              <ul class="checklist">
+                <li>Go to <strong>aistudio.google.com</strong> in your browser</li>
+                <li>Sign in with your Google account</li>
+                <li>Click <strong>"Get API Key"</strong> in the top left</li>
+                <li>Click <strong>"Create API key"</strong> → select "Create API key in new project"</li>
+                <li>Copy the key — it looks like <code>AIzaSy...</code> — and save it in a text file</li>
+              </ul>
+              <div class="callout google"><strong>✦ Free tier limits:</strong> 1,500 requests/day and 1 million tokens/minute. For a learning project asking occasional Superstore questions, you will never hit these limits. Completely free, no credit card needed.</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-dot">5</div>
+            <div class="step-content">
+              <h4>Test Gemini works from Python</h4>
+              <p>Create a quick test file to confirm your API key works before building anything:</p>
+              <div class="code-block"><span class="comment"># Create test_gemini.py and run it:</span>
+<span class="cmd">from</span> langchain_google_genai <span class="cmd">import</span> ChatGoogleGenerativeAI
+
+llm = ChatGoogleGenerativeAI(
+    model=<span class="str">"gemini-1.5-flash"</span>,
+    google_api_key=<span class="google">"YOUR_API_KEY_HERE"</span>,
+    temperature=0.1
+)
+
+response = llm.invoke(<span class="str">"Say hello and confirm you are working!"</span>)
+print(response.content)</div>
+              <div class="code-block"><span class="cmd">python</span> test_gemini.py
+<span class="comment"># Should respond in 2-3 seconds with a greeting ✅</span></div>
+            </div>
+          </div>
+
+        </div>
+        <div class="callout success" style="margin-top:24px;"><strong>✅ Phase 1 done when:</strong> <code>test_gemini.py</code> runs and Gemini responds in 2–3 seconds. No Ollama, no RAM issues, no waiting!</div>
+      </div>
+    </div>
+
+    <!-- PHASE 2 -->
+    <div class="phase p2" id="phase2">
+      <div class="phase-header" onclick="togglePhase('phase2')">
+        <div class="phase-num">2</div>
+        <div class="phase-meta">
+          <div class="phase-title">Process the Superstore Data</div>
+          <div class="phase-subtitle">~30 min · Turn CSV rows into AI-searchable knowledge</div>
+        </div>
+        <div class="phase-toggle">▼</div>
+      </div>
+      <div class="phase-body">
+        <div class="concept">
+          <div class="concept-title">What you'll learn</div>
+          <p>
+            What <strong>embeddings</strong> are and how ChromaDB stores them locally on your SSD.
+            This is the step that makes your data searchable by the AI.
+            The embedding model runs locally (small, fast, no RAM issues) —
+            only the final AI answer goes through Gemini.
+          </p>
+        </div>
+        <div class="concept">
+          <div class="concept-title">What is an Embedding? Simply explained</div>
+          <p>
+            An embedding converts text into a list of numbers. "High profit in West region" and
+            "West region is profitable" produce <strong>very similar number lists</strong> — so the system
+            knows they mean the same thing and groups them together.
+            ChromaDB stores all these numbers and instantly finds the most relevant rows for any question you ask.
+          </p>
+        </div>
+        <div class="steps">
+
+          <div class="step">
+            <div class="step-dot">1</div>
+            <div class="step-content">
+              <h4>Export Superstore data from Tableau</h4>
+              <p>In Tableau Desktop, open your Superstore workbook → go to the <strong>Data Source</strong> tab → right-click the Orders sheet → <strong>Export Data to CSV</strong> → save as <code>superstore.csv</code> in <code>C:\Projects\tableau-rag\</code>.</p>
+              <div class="callout"><strong>Alternative:</strong> Tableau installs the Superstore file at <code>C:\Program Files\Tableau\Tableau [version]\Datasources\</code>. Open in Excel, go to Orders sheet, Save As CSV.</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-dot">2</div>
+            <div class="step-content">
+              <h4>Check your column names first!</h4>
+              <p>Open <code>superstore.csv</code> in VS Code and look at the header row before writing any code. Common variations:</p>
+              <div class="code-block"><span class="comment"># Typical Superstore column names — verify yours match:</span>
+<span class="str">Order ID, Order Date, Ship Mode, Customer Name, Segment</span>
+<span class="str">Region, State, Category, Sub-Category, Product Name</span>
+<span class="str">Sales, Quantity, Discount, Profit</span>
+<span class="comment"># Note: might be "Sub Category" (no hyphen) — check carefully!</span></div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-dot">3</div>
+            <div class="step-content">
+              <h4>Create <code>ingest.py</code> — build the knowledge base</h4>
+              <p>Run this <strong>once only</strong>. It saves ChromaDB to your SSD and you never need to run it again unless your data changes.</p>
+              <div class="code-block"><span class="comment"># ingest.py — Run ONCE to build your ChromaDB knowledge base</span>
+<span class="cmd">import</span> pandas as pd
+<span class="cmd">from</span> langchain_community.vectorstores <span class="cmd">import</span> Chroma
+<span class="cmd">from</span> langchain_community.embeddings <span class="cmd">import</span> HuggingFaceEmbeddings
+
+<span class="comment"># Load Superstore CSV</span>
+df = pd.read_csv(<span class="str">"superstore.csv"</span>)
+print(f<span class="str">"Loaded {len(df)} rows"</span>)
+print(<span class="str">"Columns:"</span>, df.columns.tolist())  <span class="comment"># Check names here!</span>
+
+<span class="comment"># Convert each row into a descriptive sentence</span>
+<span class="cmd">def</span> row_to_text(row):
+    <span class="cmd">return</span> (
+        f<span class="str">"Order {row['Order ID']}: {row['Category']} › {row['Sub-Category']} — "</span>
+        f<span class="str">"{row['Product Name']}. Region: {row['Region']}, State: {row['State']}. "</span>
+        f<span class="str">"Sales: ${row['Sales']:.2f}, Profit: ${row['Profit']:.2f}, "</span>
+        f<span class="str">"Quantity: {row['Quantity']}, Discount: {row['Discount']:.0%}. "</span>
+        f<span class="str">"Segment: {row['Segment']}, Ship Mode: {row['Ship Mode']}."</span>
+    )
+
+texts = df.apply(row_to_text, axis=1).tolist()
+print(f<span class="str">"Sample: {texts[0]}"</span>)  <span class="comment"># Preview first converted row</span>
+
+<span class="comment"># Embedding model — runs locally, tiny RAM footprint (~200MB)</span>
+embeddings = HuggingFaceEmbeddings(model_name=<span class="str">"all-MiniLM-L6-v2"</span>)
+
+<span class="comment"># Build and save ChromaDB to your SSD</span>
+print(<span class="str">"Building ChromaDB... (2-5 mins)"</span>)
+vectorstore = Chroma.from_texts(
+    texts=texts,
+    embedding=embeddings,
+    persist_directory=<span class="str">"./chroma_db"</span>
+)
+
+print(f<span class="str">"✅ Done! {len(texts)} rows stored in ChromaDB."</span>)
+print(<span class="str">"chroma_db/ folder saved — never run this again!"</span>)</div>
+              <div class="callout warn"><strong>⚠️ KeyError?</strong> Means a column name in the code doesn't match your CSV. Look at the printed column list and fix the names in <code>row_to_text</code>. The most common mismatch is <code>Sub-Category</code> vs <code>Sub Category</code>.</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-dot">4</div>
+            <div class="step-content">
+              <h4>Run the ingestion</h4>
+              <div class="code-block"><span class="cmd">python</span> ingest.py
+<span class="comment"># First run downloads the embedding model (~90MB) — one time only</span>
+<span class="comment"># Then processes ~10k rows in 2-5 minutes on your i5</span>
+<span class="comment"># ✅ Done! 9994 rows stored in ChromaDB.</span></div>
+            </div>
+          </div>
+
+        </div>
+        <div class="callout success" style="margin-top:24px;"><strong>✅ Phase 2 done when:</strong> The <code>chroma_db/</code> folder exists in your project folder. Done — never run ingest.py again!</div>
+      </div>
+    </div>
+
+    <!-- PHASE 3 -->
+    <div class="phase p3" id="phase3">
+      <div class="phase-header" onclick="togglePhase('phase3')">
+        <div class="phase-num">3</div>
+        <div class="phase-meta">
+          <div class="phase-title">Build the RAG Backend</div>
+          <div class="phase-subtitle">~45 min · LangChain + Gemini + FastAPI</div>
+        </div>
+        <div class="phase-toggle">▼</div>
+      </div>
+      <div class="phase-body">
+        <div class="concept">
+          <div class="concept-title">What you'll learn</div>
+          <p>
+            How a LangChain RAG chain works: it searches ChromaDB for the most relevant Superstore rows,
+            builds a prompt, and sends it to Gemini — which replies in 2–3 seconds.
+            Then you'll wrap it in FastAPI so Tableau can talk to it via HTTP.
+          </p>
+        </div>
+        <div class="steps">
+
+          <div class="step">
+            <div class="step-dot">1</div>
+            <div class="step-content">
+              <h4>Create <code>rag_chain.py</code> — the core RAG logic</h4>
+              <div class="code-block"><span class="comment"># rag_chain.py</span>
+<span class="cmd">from</span> langchain_community.vectorstores <span class="cmd">import</span> Chroma
+<span class="cmd">from</span> langchain_community.embeddings <span class="cmd">import</span> HuggingFaceEmbeddings
+<span class="cmd">from</span> langchain_google_genai <span class="cmd">import</span> ChatGoogleGenerativeAI
+<span class="cmd">from</span> langchain.chains <span class="cmd">import</span> RetrievalQA
+<span class="cmd">from</span> langchain.prompts <span class="cmd">import</span> PromptTemplate
+
+<span class="comment"># Must match the model used in ingest.py!</span>
+embeddings = HuggingFaceEmbeddings(model_name=<span class="str">"all-MiniLM-L6-v2"</span>)
+
+<span class="comment"># Load ChromaDB from your SSD</span>
+vectorstore = Chroma(
+    persist_directory=<span class="str">"./chroma_db"</span>,
+    embedding_function=embeddings
+)
+
+<span class="comment"># Connect to Gemini — paste your API key here</span>
+llm = ChatGoogleGenerativeAI(
+    model=<span class="str">"gemini-1.5-flash"</span>,
+    google_api_key=<span class="google">"YOUR_API_KEY_HERE"</span>,
+    temperature=0.1  <span class="comment"># Low = more factual, less creative</span>
+)
+
+<span class="comment"># Prompt tells Gemini its role and how to use the data</span>
+prompt_template = <span class="str">"""You are a business data analyst for Tableau Superstore data.
+Use only the data context below to answer the question.
+Be concise and specific. If the answer is not in the context,
+say "I don't have enough data to answer that."
+
+Context (relevant Superstore records):
+{context}
+
+Question: {question}
+
+Answer:"""</span>
+
+prompt = PromptTemplate(
+    template=prompt_template,
+    input_variables=[<span class="str">"context"</span>, <span class="str">"question"</span>]
+)
+
+<span class="comment"># k=8 retrieves 8 most relevant rows — good balance for Superstore</span>
+qa_chain = RetrievalQA.from_chain_type(
+    llm=llm,
+    chain_type=<span class="str">"stuff"</span>,
+    retriever=vectorstore.as_retriever(search_kwargs={<span class="str">"k"</span>: 8}),
+    chain_type_kwargs={<span class="str">"prompt"</span>: prompt},
+    return_source_documents=True
+)
+
+<span class="cmd">def</span> ask(question: str) -> dict:
+    result = qa_chain.invoke({<span class="str">"query"</span>: question})
+    <span class="cmd">return</span> {
+        <span class="str">"answer"</span>: result[<span class="str">"result"</span>],
+        <span class="str">"sources_count"</span>: len(result[<span class="str">"source_documents"</span>])
+    }</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-dot">2</div>
+            <div class="step-content">
+              <h4>Test the RAG in terminal first</h4>
+              <div class="code-block"><span class="comment"># test_rag.py</span>
+<span class="cmd">from</span> rag_chain <span class="cmd">import</span> ask
+
+print(<span class="str">"Testing RAG with Gemini..."</span>)
+result = ask(<span class="str">"Which product category has the highest total profit?"</span>)
+print(<span class="str">"Answer:"</span>, result[<span class="str">"answer"</span>])
+print(<span class="str">"Based on:"</span>, result[<span class="str">"sources_count"</span>], <span class="str">"records"</span>)</div>
+              <div class="code-block"><span class="cmd">python</span> test_rag.py
+<span class="comment"># Should answer in 2-3 seconds — Gemini is fast! ✅</span></div>
+              <div class="callout google"><strong>✦ This is the moment</strong> where all the pieces connect — ChromaDB finds the right rows, LangChain builds the prompt, Gemini answers in seconds. That's a working RAG!</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-dot">3</div>
+            <div class="step-content">
+              <h4>Create <code>api_server.py</code> — the HTTP bridge to Tableau</h4>
+              <div class="code-block"><span class="comment"># api_server.py</span>
+<span class="cmd">from</span> fastapi <span class="cmd">import</span> FastAPI
+<span class="cmd">from</span> fastapi.middleware.cors <span class="cmd">import</span> CORSMiddleware
+<span class="cmd">from</span> pydantic <span class="cmd">import</span> BaseModel
+<span class="cmd">from</span> rag_chain <span class="cmd">import</span> ask
+
+app = FastAPI(title=<span class="str">"Superstore RAG API"</span>)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[<span class="str">"*"</span>],
+    allow_methods=[<span class="str">"*"</span>],
+    allow_headers=[<span class="str">"*"</span>]
+)
+
+<span class="cmd">class</span> Question(BaseModel):
+    question: str
+
+@app.post(<span class="str">"/ask"</span>)
+<span class="cmd">async def</span> answer_question(q: Question):
+    <span class="cmd">return</span> ask(q.question)
+
+@app.get(<span class="str">"/"</span>)
+<span class="cmd">async def</span> health():
+    <span class="cmd">return</span> {<span class="str">"status"</span>: <span class="str">"Superstore RAG running! ✦ Powered by Gemini"</span>}</div>
+              <div class="code-block"><span class="comment"># Start the server:</span>
+<span class="cmd">uvicorn</span> api_server:app --reload --port 8000
+
+<span class="comment"># Visit in browser: http://localhost:8000</span>
+<span class="comment"># Should show: {"status": "Superstore RAG running! ✦ Powered by Gemini"}</span></div>
+            </div>
+          </div>
+
+        </div>
+        <div class="callout success" style="margin-top:24px;"><strong>✅ Phase 3 done when:</strong> <code>test_rag.py</code> gives a real answer in ~3 seconds AND <code>http://localhost:8000</code> shows the running status.</div>
+      </div>
+    </div>
+
+    <!-- PHASE 4 -->
+    <div class="phase p4" id="phase4">
+      <div class="phase-header" onclick="togglePhase('phase4')">
+        <div class="phase-num">4</div>
+        <div class="phase-meta">
+          <div class="phase-title">Build the Tableau Extension</div>
+          <div class="phase-subtitle">~45 min · The chat panel inside Tableau</div>
+        </div>
+        <div class="phase-toggle">▼</div>
+      </div>
+      <div class="phase-body">
+        <div class="concept">
+          <div class="concept-title">What you'll learn</div>
+          <p>
+            A Tableau Dashboard Extension is just an <strong>HTML page that Tableau hosts inside a panel</strong>.
+            You'll build a chat UI that calls your FastAPI server and shows Gemini's answers.
+            Fully supported on free Tableau Desktop. ✅
+          </p>
+        </div>
+        <div class="steps">
+
+          <div class="step">
+            <div class="step-dot">1</div>
+            <div class="step-content">
+              <h4>Create the extension folder and chat UI</h4>
+              <p>Create folder <code>C:\Projects\tableau-rag\extension\</code> and inside it create <code>index.html</code>:</p>
+              <div class="code-block">&lt;!DOCTYPE html&gt;
+&lt;html&gt;
+&lt;head&gt;
+  &lt;title&gt;Superstore AI&lt;/title&gt;
+  &lt;style&gt;
+    body { font-family:sans-serif; margin:0; padding:12px;
+           background:#f8f9fa; height:100vh; box-sizing:border-box; }
+    #chat { height:calc(100vh - 120px); overflow-y:auto;
+            background:white; border:1px solid #ddd;
+            padding:12px; margin-bottom:10px; border-radius:4px; }
+    .msg-user { text-align:right; margin:8px 0; }
+    .msg-user span { background:#1a73e8; color:white; padding:8px 12px;
+                     border-radius:12px; display:inline-block; max-width:80%; }
+    .msg-ai { text-align:left; margin:8px 0; }
+    .msg-ai span { background:#e9ecef; color:#333; padding:8px 12px;
+                   border-radius:12px; display:inline-block;
+                   max-width:85%; line-height:1.5; }
+    #input-row { display:flex; gap:8px; }
+    #question { flex:1; padding:8px; border:1px solid #ddd;
+                border-radius:4px; font-size:14px; }
+    button { padding:8px 16px; background:#1a73e8; color:white;
+             border:none; border-radius:4px; cursor:pointer; }
+    button:disabled { background:#aaa; cursor:wait; }
+  &lt;/style&gt;
+&lt;/head&gt;
+&lt;body&gt;
+  &lt;div id="chat"&gt;
+    &lt;div class="msg-ai"&gt;
+      &lt;span&gt;✦ Hi! Ask me anything about Superstore data.&lt;br&gt;
+      Powered by Gemini — answers in ~3 seconds!&lt;/span&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+  &lt;div id="input-row"&gt;
+    &lt;input id="question" type="text"
+           placeholder="e.g. Which region has the best profit?"
+           onkeydown="if(event.key==='Enter') sendQuestion()" /&gt;
+    &lt;button onclick="sendQuestion()" id="btn"&gt;Ask AI&lt;/button&gt;
+  &lt;/div&gt;
+  &lt;script&gt;
+    const API = 'http://localhost:8000/ask';
+    async function sendQuestion() {
+      const input = document.getElementById('question');
+      const chat  = document.getElementById('chat');
+      const btn   = document.getElementById('btn');
+      const q = input.value.trim();
+      if (!q) return;
+      chat.innerHTML += `&lt;div class="msg-user"&gt;&lt;span&gt;${q}&lt;/span&gt;&lt;/div&gt;`;
+      chat.innerHTML += `&lt;div class="msg-ai" id="loading"&gt;&lt;span&gt;✦ Thinking...&lt;/span&gt;&lt;/div&gt;`;
+      input.value = ''; btn.disabled = true; btn.textContent = '...';
+      chat.scrollTop = chat.scrollHeight;
+      try {
+        const res = await fetch(API, {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ question: q })
+        });
+        const data = await res.json();
+        document.getElementById('loading')?.remove();
+        chat.innerHTML += `&lt;div class="msg-ai"&gt;&lt;span&gt;${data.answer}&lt;/span&gt;&lt;/div&gt;`;
+      } catch(e) {
+        document.getElementById('loading')?.remove();
+        chat.innerHTML += `&lt;div class="msg-ai"&gt;&lt;span&gt;
+          ⚠️ Error. Is uvicorn running on port 8000?&lt;/span&gt;&lt;/div&gt;`;
+      }
+      btn.disabled = false; btn.textContent = 'Ask AI';
+      chat.scrollTop = chat.scrollHeight;
+    }
+  &lt;/script&gt;
+&lt;/body&gt;
+&lt;/html&gt;</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-dot">2</div>
+            <div class="step-content">
+              <h4>Create the <code>.trex</code> manifest file</h4>
+              <p>Create <code>extension/superstore-rag.trex</code>:</p>
+              <div class="code-block">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;manifest manifest-version="0.1"
+  xmlns="http://www.tableau.com/xml/extension_manifest"&gt;
+  &lt;dashboard-extension id="com.learning.superstore-rag"
+    extension-version="1.0.0"&gt;
+    &lt;default-locale&gt;en_US&lt;/default-locale&gt;
+    &lt;name resource-id="name"&gt;Superstore AI Assistant&lt;/name&gt;
+    &lt;description&gt;Ask Gemini about your Superstore data&lt;/description&gt;
+    &lt;source-location&gt;
+      &lt;url&gt;http://localhost:5500/index.html&lt;/url&gt;
+    &lt;/source-location&gt;
+    &lt;icon&gt;&lt;/icon&gt;
+  &lt;/dashboard-extension&gt;
+  &lt;resources&gt;
+    &lt;resource id="name"&gt;
+      &lt;string locale="en_US"&gt;Superstore AI Assistant&lt;/string&gt;
+    &lt;/resource&gt;
+  &lt;/resources&gt;
+&lt;/manifest&gt;</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-dot">3</div>
+            <div class="step-content">
+              <h4>Serve the extension on localhost:5500</h4>
+              <div class="code-block"><span class="comment"># Open a new CMD tab, navigate to extension folder:</span>
+<span class="cmd">cd /d</span> C:\Projects\tableau-rag\extension
+<span class="cmd">python -m</span> http.server 5500
+<span class="comment"># Extension available at: http://localhost:5500/index.html</span></div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-dot">4</div>
+            <div class="step-content">
+              <h4>Add to Tableau Dashboard</h4>
+              <ul class="checklist">
+                <li>Open your Superstore workbook in Tableau Desktop</li>
+                <li>Open or create a Dashboard</li>
+                <li>In the left panel → <strong>Objects</strong> → drag <strong>Extension</strong> onto the dashboard</li>
+                <li>Click <strong>"Access Local Extensions"</strong></li>
+                <li>Browse to <code>extension\superstore-rag.trex</code></li>
+                <li>Click OK on any permission popup — you're the developer!</li>
+                <li>Chat panel appears in your dashboard ✅</li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+        <div class="callout success" style="margin-top:24px;"><strong>✅ Phase 4 done when:</strong> The chat panel is visible in your Tableau dashboard showing the Gemini welcome message.</div>
+      </div>
+    </div>
+
+    <!-- PHASE 5 -->
+    <div class="phase p5" id="phase5">
+      <div class="phase-header" onclick="togglePhase('phase5')">
+        <div class="phase-num">5</div>
+        <div class="phase-meta">
+          <div class="phase-title">Connect Everything &amp; Test</div>
+          <div class="phase-subtitle">~30 min · Start it all up and ask your first questions</div>
+        </div>
+        <div class="phase-toggle">▼</div>
+      </div>
+      <div class="phase-body">
+        <div class="concept">
+          <div class="concept-title">The startup sequence — only 2 terminals now!</div>
+          <p>No Ollama means one less thing to start. Every session just needs 2 CMD windows running simultaneously.</p>
+        </div>
+        <div class="steps">
+
+          <div class="step">
+            <div class="step-dot">1</div>
+            <div class="step-content">
+              <h4>Start the 2 services</h4>
+              <div class="code-block"><span class="comment"># ── Terminal 1 — RAG API server</span>
+<span class="cmd">cd /d</span> C:\Projects\tableau-rag
+venv\Scripts\activate
+<span class="cmd">uvicorn</span> api_server:app --port 8000
+<span class="comment"># Confirm: visit http://localhost:8000 in browser</span>
+
+<span class="comment"># ── Terminal 2 — Tableau Extension server</span>
+<span class="cmd">cd /d</span> C:\Projects\tableau-rag\extension
+<span class="cmd">python -m</span> http.server 5500</div>
+              <div class="callout google"><strong>✦ Notice:</strong> No <code>ollama serve</code> needed anymore! Gemini runs on Google's servers — you just need your two lightweight local servers running.</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-dot">2</div>
+            <div class="step-content">
+              <h4>Create <code>start.bat</code> — one double-click to start everything</h4>
+              <p>Save this as <code>C:\Projects\tableau-rag\start.bat</code>:</p>
+              <div class="code-block"><span class="comment">@echo off</span>
+echo Starting Superstore RAG (Gemini Edition)...
+<span class="cmd">start</span> cmd /k "cd /d C:\Projects\tableau-rag && venv\Scripts\activate && uvicorn api_server:app --port 8000"
+<span class="cmd">timeout</span> /t 2
+<span class="cmd">start</span> cmd /k "cd /d C:\Projects\tableau-rag\extension && python -m http.server 5500"
+echo Done! Both services started. Now open Tableau Desktop.</div>
+              <p>Double-click <code>start.bat</code> every time you want to use the system!</p>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-dot">3</div>
+            <div class="step-content">
+              <h4>Ask your first questions in Tableau!</h4>
+              <div class="code-block"><span class="str">"Which product category has the highest total profit?"</span>
+<span class="str">"Compare profit margins between Consumer and Corporate segments"</span>
+<span class="str">"What are the top 3 states by total sales?"</span>
+<span class="str">"Which ship mode is most used in the West region?"</span>
+<span class="str">"Summarize overall Superstore business performance"</span></div>
+              <div class="callout google"><strong>✦ Enjoy the speed!</strong> Gemini answers in 2–3 seconds. After all the Ollama RAM struggles, this should feel like magic. 🚀</div>
+            </div>
+          </div>
+
+        </div>
+        <div class="callout success" style="margin-top:24px;"><strong>✅ Phase 5 done when:</strong> You ask a Superstore question in the Tableau chat panel and get a real AI answer in ~3 seconds. You've built a working RAG! 🎉</div>
+      </div>
+    </div>
+
+    <!-- PHASE 6 -->
+    <div class="phase p6" id="phase6">
+      <div class="phase-header" onclick="togglePhase('phase6')">
+        <div class="phase-num">6</div>
+        <div class="phase-meta">
+          <div class="phase-title">Dashboard Context Injection</div>
+          <div class="phase-subtitle">~45 min · Make Gemini "see" your active filters &amp; selections</div>
+        </div>
+        <div class="phase-toggle">▼</div>
+      </div>
+      <div class="phase-body">
+        <div class="concept">
+          <div class="concept-title">What you'll learn</div>
+          <p>
+            The Tableau Extensions API (free, works on free Desktop ✅) lets your HTML page read live dashboard state —
+            active filters, selected marks, parameter values. You'll inject this context silently into every
+            Gemini question so the AI answers about <em>exactly what the user is looking at</em>.
+          </p>
+        </div>
+        <div class="concept">
+          <div class="concept-title">Simply explained</div>
+          <p>
+            You filter to "West Region, Furniture". You type "how are profits?".
+            Without Phase 6: Gemini answers about all regions and all categories.
+            With Phase 6: Gemini reads your filters automatically and answers about
+            <strong>West Region + Furniture only</strong> — without you typing that in the chat.
+          </p>
+        </div>
+        <div class="steps">
+
+          <div class="step">
+            <div class="step-dot">1</div>
+            <div class="step-content">
+              <h4>Add Tableau Extensions API to your HTML</h4>
+              <p>Add this inside <code>&lt;head&gt;</code> in <code>extension/index.html</code>:</p>
+              <div class="code-block"><span class="comment">&lt;!-- Tableau's official JS library — free CDN link --&gt;</span>
+&lt;script src="https://cdn.jsdelivr.net/npm/tableau.extensions.api/lib/tableau.extensions.1.latest.min.js"&gt;&lt;/script&gt;</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-dot">2</div>
+            <div class="step-content">
+              <h4>Create <code>extension/context.js</code></h4>
+              <div class="code-block"><span class="comment">// context.js — reads live Tableau dashboard state</span>
+
+<span class="cmd">async function</span> initTableau() {
+  <span class="cmd">return new</span> Promise((resolve, reject) => {
+    tableau.extensions.initializeAsync().then(resolve).catch(reject);
+  });
+}
+
+<span class="cmd">async function</span> getActiveFilters() {
+  <span class="cmd">const</span> dashboard = tableau.extensions.dashboardContent.dashboard;
+  <span class="cmd">const</span> filterSummary = [];
+  <span class="cmd">for</span> (const ws of dashboard.worksheets) {
+    <span class="cmd">try</span> {
+      <span class="cmd">const</span> filters = await ws.getFiltersAsync();
+      <span class="cmd">for</span> (const f of filters) {
+        <span class="cmd">if</span> (f.filterType === <span class="str">'categorical'</span>) {
+          <span class="cmd">const</span> vals = f.appliedValues.map(v => v.formattedValue);
+          <span class="cmd">if</span> (vals.length > 0 && vals.length < 20)
+            filterSummary.push(`${f.fieldName}: ${vals.join(', ')}`);
+        } <span class="cmd">else if</span> (f.filterType === <span class="str">'range'</span>) {
+          filterSummary.push(`${f.fieldName}: ${f.minValue?.formattedValue} to ${f.maxValue?.formattedValue}`);
+        }
+      }
+    } <span class="cmd">catch</span>(e) {}
+  }
+  <span class="cmd">return</span> [...new Set(filterSummary)];
+}
+
+<span class="cmd">async function</span> getSelectedMarks() {
+  <span class="cmd">const</span> dashboard = tableau.extensions.dashboardContent.dashboard;
+  <span class="cmd">const</span> markSummary = [];
+  <span class="cmd">for</span> (const ws of dashboard.worksheets) {
+    <span class="cmd">try</span> {
+      <span class="cmd">const</span> marks = await ws.getSelectedMarksAsync();
+      <span class="cmd">if</span> (marks.data.length > 0) {
+        <span class="cmd">const</span> cols = marks.data[0].columns.map(c => c.fieldName);
+        marks.data[0].data.slice(0, 5).forEach(row => {
+          markSummary.push(cols.map((c,i) => `${c}=${row[i].formattedValue}`).join(', '));
+        });
+      }
+    } <span class="cmd">catch</span>(e) {}
+  }
+  <span class="cmd">return</span> markSummary;
+}
+
+<span class="cmd">async function</span> buildDashboardContext() {
+  <span class="cmd">const</span> parts = [];
+  <span class="cmd">const</span> filters = await getActiveFilters();
+  <span class="cmd">if</span> (filters.length > 0) parts.push(`Active filters: ${filters.join(' | ')}`);
+  <span class="cmd">const</span> marks = await getSelectedMarks();
+  <span class="cmd">if</span> (marks.length > 0) parts.push(`Selected: ${marks.join(' ; ')}`);
+  <span class="cmd">return</span> parts.length > 0 ? `[Dashboard Context: ${parts.join('. ')}]\n\n` : <span class="str">''</span>;
+}</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-dot">3</div>
+            <div class="step-content">
+              <h4>Update <code>index.html</code> to use context</h4>
+              <p>Add context.js script tag and update the JS block:</p>
+              <div class="code-block"><span class="comment">&lt;!-- Add after Tableau API script in &lt;head&gt; --&gt;</span>
+&lt;script src="context.js"&gt;&lt;/script&gt;
+
+<span class="comment">&lt;!-- Add status bar above &lt;div id="chat"&gt; --&gt;</span>
+&lt;div id="ctx-bar" style="display:none; margin-bottom:8px;"&gt;
+  &lt;div id="ctx-text" style="font-size:11px; color:#444;
+    background:#e8f4ff; border:1px solid #b3d4f0;
+    border-radius:4px; padding:5px 10px;"&gt;
+    Reading filters...
+  &lt;/div&gt;
+&lt;/div&gt;</div>
+              <div class="code-block"><span class="comment">// Replace entire &lt;script&gt; block with this:</span>
+<span class="cmd">const</span> API = <span class="str">'http://localhost:8000/ask'</span>;
+<span class="cmd">let</span> tableauReady = false;
+
+initTableau().then(() => {
+  tableauReady = true;
+  document.getElementById(<span class="str">'ctx-bar'</span>).style.display = <span class="str">'block'</span>;
+  updateContextPreview();
+  <span class="cmd">const</span> db = tableau.extensions.dashboardContent.dashboard;
+  db.worksheets.forEach(ws => {
+    ws.addEventListener(tableau.TableauEventType.FilterChanged, updateContextPreview);
+    ws.addEventListener(tableau.TableauEventType.MarkSelectionChanged, updateContextPreview);
+  });
+}).catch(() => console.log(<span class="str">'Running without Tableau context'</span>));
+
+<span class="cmd">async function</span> updateContextPreview() {
+  <span class="cmd">const</span> ctx = await buildDashboardContext();
+  document.getElementById(<span class="str">'ctx-text'</span>).textContent = ctx
+    ? <span class="str">'🎯 '</span> + ctx.replace(<span class="str">'[Dashboard Context: '</span>,<span class="str">''</span>).replace(<span class="str">']'</span>,<span class="str">''</span>).trim()
+    : <span class="str">'No filters — answering about all data'</span>;
+}
+
+<span class="cmd">async function</span> sendQuestion() {
+  <span class="cmd">const</span> input = document.getElementById(<span class="str">'question'</span>);
+  <span class="cmd">const</span> chat  = document.getElementById(<span class="str">'chat'</span>);
+  <span class="cmd">const</span> btn   = document.getElementById(<span class="str">'btn'</span>);
+  <span class="cmd">const</span> q = input.value.trim();
+  <span class="cmd">if</span> (!q) return;
+
+  <span class="cmd">let</span> ctx = tableauReady ? await buildDashboardContext() : <span class="str">''</span>;
+  chat.innerHTML += `&lt;div class="msg-user"&gt;&lt;span&gt;${q}&lt;/span&gt;&lt;/div&gt;`;
+  <span class="cmd">if</span> (ctx) {
+    <span class="cmd">const</span> label = ctx.replace(<span class="str">'[Dashboard Context: '</span>,<span class="str">''</span>).replace(<span class="str">']'</span>,<span class="str">''</span>).trim();
+    chat.innerHTML += `&lt;div style="text-align:center;margin:3px 0 8px"&gt;
+      &lt;span style="font-size:10px;color:#666;background:#f0f4ff;
+        border:1px dashed #b3c6e0;padding:3px 10px;border-radius:12px;
+        font-style:italic"&gt;📍 ${label}&lt;/span&gt;&lt;/div&gt;`;
+  }
+  input.value = <span class="str">''</span>; btn.disabled = true; btn.textContent = <span class="str">'...'</span>;
+  chat.innerHTML += `&lt;div class="msg-ai" id="loading"&gt;&lt;span&gt;✦ Asking Gemini...&lt;/span&gt;&lt;/div&gt;`;
+  chat.scrollTop = chat.scrollHeight;
+
+  <span class="cmd">try</span> {
+    <span class="cmd">const</span> res = await fetch(API, {
+      method:<span class="str">'POST'</span>, headers:{<span class="str">'Content-Type'</span>:<span class="str">'application/json'</span>},
+      body: JSON.stringify({ question: ctx + q })
+    });
+    <span class="cmd">const</span> data = await res.json();
+    document.getElementById(<span class="str">'loading'</span>)?.remove();
+    chat.innerHTML += `&lt;div class="msg-ai"&gt;&lt;span&gt;${data.answer}&lt;/span&gt;&lt;/div&gt;`;
+  } <span class="cmd">catch</span>(e) {
+    document.getElementById(<span class="str">'loading'</span>)?.remove();
+    chat.innerHTML += `&lt;div class="msg-ai"&gt;&lt;span&gt;⚠️ Error. Is uvicorn running?&lt;/span&gt;&lt;/div&gt;`;
+  }
+  btn.disabled = false; btn.textContent = <span class="str">'Ask AI'</span>;
+  chat.scrollTop = chat.scrollHeight;
+}</div>
+            </div>
+          </div>
+
+          <div class="step">
+            <div class="step-dot">4</div>
+            <div class="step-content">
+              <h4>Test the magic ✨</h4>
+              <ul class="checklist">
+                <li>Apply a <strong>Region filter</strong> on your dashboard — select "West" only</li>
+                <li>Context bar updates: <em>"🎯 Active filters: Region: West"</em></li>
+                <li>Type: <em>"What's the best performing product?"</em> — Gemini answers about West only!</li>
+                <li>Change filter to "East" — same question — different answer!</li>
+                <li>Click a bar in a chart → ask <em>"Tell me more about this"</em></li>
+                <li>Remove all filters — context bar says "No filters — answering about all data"</li>
+              </ul>
+            </div>
+          </div>
+
+        </div>
+        <div class="callout success" style="margin-top:24px;"><strong>✅ Phase 6 done when:</strong> You filter to a Region, ask "how are profits?", and Gemini answers specifically about that region — automatically, without you typing it. That's the full system! 🎉</div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- PROJECT STRUCTURE -->
+<section class="section">
+  <div class="section-label">Reference</div>
+  <div class="section-title">Complete project structure</div>
+  <div class="code-block">C:\Projects\tableau-rag\
+│
+├── <span class="str">superstore.csv</span>          ← Exported from Tableau (Phase 2)
+├── <span class="str">ingest.py</span>               ← Phase 2: Run ONCE to build ChromaDB
+├── <span class="str">rag_chain.py</span>            ← Phase 3: LangChain + Gemini RAG logic
+├── <span class="str">api_server.py</span>           ← Phase 3: FastAPI server on port 8000
+├── <span class="str">test_gemini.py</span>          ← Phase 1: Verify Gemini API key works
+├── <span class="str">test_rag.py</span>             ← Phase 3: Quick terminal RAG test
+├── <span class="str">start.bat</span>               ← Phase 5: Double-click to start everything
+│
+├── <span class="cmd">chroma_db/</span>              ← Built by ingest.py — your vector DB on SSD
+│
+├── <span class="cmd">extension/</span>
+│   ├── <span class="str">index.html</span>          ← Phase 4+6: Chat UI inside Tableau
+│   ├── <span class="str">context.js</span>          ← Phase 6: Reads Tableau filters &amp; selections
+│   └── <span class="str">superstore-rag.trex</span> ← Phase 4: Tableau extension manifest
+│
+└── <span class="cmd">venv/</span>                   ← Python virtual environment</div>
+
+  <div class="callout google" style="margin-top:20px;">
+    <strong>✦ Every session reminder:</strong> Double-click <code>start.bat</code> → open Tableau → done. No Ollama, no RAM issues, no waiting. Gemini handles the AI, your machine just runs ChromaDB + FastAPI.
+  </div>
+
+  <div class="callout warn" style="margin-top:12px;">
+    <strong>⚠️ Always use CMD not PowerShell</strong> in Windows Terminal. And always navigate with <code>cd /d C:\Projects\tableau-rag</code> (the /d flag matters!).
+  </div>
+</section>
+
+<footer>
+  <div class="footer-logo">RAG × Tableau</div>
+  <p>v3 · i5-6300HQ · 8GB RAM · GTX 950M · Windows · Gemini 1.5 Flash free tier</p>
+  <p>Phase 1 → 2 → 3 → 4 → 5 → 6 · ~4 hours · 100% free</p>
+</footer>
+
+<script>
+  function togglePhase(id) {
+    document.getElementById(id).classList.toggle('open');
+  }
+</script>
+
+</body>
+</html>
