@@ -1,1 +1,110 @@
 
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Superstore AI</title>
+  <style>
+    body { font-family:sans-serif; margin:0; padding:12px;
+           background:#f8f9fa; height:100vh; box-sizing:border-box; }
+    #chat { height:calc(100vh - 120px); overflow-y:auto;
+            background:white; border:1px solid #ddd;
+            padding:12px; margin-bottom:10px; border-radius:4px; }
+    .msg-user { text-align:right; margin:8px 0; }
+    .msg-user span { background:#1a73e8; color:white; padding:8px 12px;
+                     border-radius:12px; display:inline-block; max-width:80%; }
+    .msg-ai { text-align:left; margin:8px 0; }
+    .msg-ai span { background:#e9ecef; color:#333; padding:8px 12px;
+                   border-radius:12px; display:inline-block;
+                   max-width:85%; line-height:1.5; }
+    #input-row { display:flex; gap:8px; }
+    #question { flex:1; padding:8px; border:1px solid #ddd;
+                border-radius:4px; font-size:14px; }
+    button { padding:8px 16px; background:#1a73e8; color:white;
+             border:none; border-radius:4px; cursor:pointer; }
+    button:disabled { background:#aaa; cursor:wait; }
+  </style>
+</head>
+<body>
+  <div id="chat">
+    <div class="msg-ai">
+      <span>✦ Hi! Ask me anything about Superstore data.<br>
+      Powered by Gemini — answers in ~3 seconds!</span>
+    </div>
+  </div>
+  <div id="input-row">
+    <input id="question" type="text"
+           placeholder="e.g. Which region has the best profit?"
+           onkeydown="if(event.key==='Enter') sendQuestion()" />
+    <button onclick="sendQuestion()" id="btn">Ask AI</button>
+  </div>
+
+  <script src="tableau.extensions.1.latest.min.js"></script>
+  <script src="context.js"></script>
+  <script>
+    const API = 'http://localhost:8000/ask';
+    let tableauReady = false;
+
+    initTableau()
+      .then(() => {
+        tableauReady = true;
+        document.getElementById('chat').innerHTML +=
+          `<div class="msg-ai"><span>🎯 Tableau connected — filters active!</span></div>`;
+        updateContextPreview();
+        const db = tableau.extensions.dashboardContent.dashboard;
+        db.worksheets.forEach(ws => {
+          ws.addEventListener(tableau.TableauEventType.FilterChanged, updateContextPreview);
+          ws.addEventListener(tableau.TableauEventType.MarkSelectionChanged, updateContextPreview);
+        });
+      })
+      .catch(() => {
+        console.log('Running without Tableau context');
+      });
+
+    async function updateContextPreview() {
+      const ctx = await buildDashboardContext();
+      document.getElementById('chat').innerHTML +=
+        `<div class="msg-ai"><span>🎯 Context updated: ${ctx || 'No filters active'}</span></div>`;
+    }
+
+    async function sendQuestion() {
+      const input = document.getElementById('question');
+      const chat  = document.getElementById('chat');
+      const btn   = document.getElementById('btn');
+      const q = input.value.trim();
+      if (!q) return;
+
+      let ctx = tableauReady ? await buildDashboardContext() : '';
+      chat.innerHTML += `<div class="msg-user"><span>${q}</span></div>`;
+      if (ctx) {
+        const label = ctx.replace('[Dashboard Context: ','').replace(']','').trim();
+        chat.innerHTML += `<div style="text-align:center;margin:3px 0 8px">
+          <span style="font-size:10px;color:#666;background:#f0f4ff;
+            border:1px dashed #b3c6e0;padding:3px 10px;border-radius:12px;
+            font-style:italic">📍 ${label}</span></div>`;
+      }
+      input.value = '';
+      btn.disabled = true;
+      btn.textContent = '...';
+      chat.innerHTML += `<div class="msg-ai" id="loading"><span>✦ Asking Gemini...</span></div>`;
+      chat.scrollTop = chat.scrollHeight;
+
+      try {
+        const res = await fetch(API, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ question: ctx + q })
+        });
+        const data = await res.json();
+        document.getElementById('loading')?.remove();
+        chat.innerHTML += `<div class="msg-ai"><span>${data.answer}</span></div>`;
+      } catch(e) {
+        document.getElementById('loading')?.remove();
+        chat.innerHTML += `<div class="msg-ai"><span>⚠️ Error. Is uvicorn running?</span></div>`;
+      }
+      btn.disabled = false;
+      btn.textContent = 'Ask AI';
+      chat.scrollTop = chat.scrollHeight;
+    }
+  </script>
+</body>
+</html>
